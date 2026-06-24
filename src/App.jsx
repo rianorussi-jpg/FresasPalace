@@ -1,27 +1,5 @@
 import { useState, useEffect } from "react";
 
-interface CarritoItem {
-  id: string;
-  nombre: string;
-  tamano: string;
-  precio: number;
-  emoji: string;
-  cantidad: number;
-  toppings?: string;
-}
-interface Entrega {
-  tipo: string;
-  hora: string;
-  subtotal: number;
-  envio: number;
-  total: number;
-}
-interface Confirmacion {
-  folio: string;
-  datos: { nombre: string };
-}
-
-
 const bg     = "#fff5f7";
 const card   = "#ffffff";
 const cardHi = "#fdedf0";
@@ -482,10 +460,10 @@ function Confirmacion({ folio, nombre, entrega, carrito, onNuevoPedido }) {
 
 export default function App() {
   const [paso,setPaso]=useState(1);
-  const [carrito,setCarrito]=useState<CarritoItem[]>([]);
-  const [entrega,setEntrega]=useState<Entrega | null>(null);
-  const [abierto,setAbierto]=useState<boolean | null>(null);
-  const [confirmacion,setConfirmacion]=useState<Confirmacion | null>(null);
+  const [carrito,setCarrito]=useState([]);
+  const [entrega,setEntrega]=useState(null);
+  const [abierto,setAbierto]=useState(null);
+  const [confirmacion,setConfirmacion]=useState(null);
 
   useEffect(()=>{
     fetch("https://timeapi.io/api/time/current/zone?timeZone=America%2FMexico_City")
@@ -494,13 +472,13 @@ export default function App() {
       .catch(()=>setAbierto(null));
   },[]);
 
-  const agregar=({id,nombre,tamano,precio,emoji,toppings}:{id:string;nombre:string;tamano:string;precio:number;emoji:string;toppings?:string})=>{
-    setCarrito(prev=>{ const ex=prev.find(i=>i.id===id&&i.tamano===tamano); if(ex) return prev.map(i=>i===ex?{...i,cantidad:i.cantidad+1}:i); return [...prev,{id,nombre,tamano,precio,emoji,toppings,cantidad:1}]; });
+  const agregar=({id,nombre,tamano,precio,emoji})=>{
+    setCarrito(prev=>{ const ex=prev.find(i=>i.id===id&&i.tamano===tamano); if(ex) return prev.map(i=>i===ex?{...i,cantidad:i.cantidad+1}:i); return [...prev,{id,nombre,tamano,precio,emoji,cantidad:1}]; });
   };
-  const quitar=(id:string,tamano:string)=>{
+  const quitar=(id,tamano)=>{
     setCarrito(prev=>{ const ex=prev.find(i=>i.id===id&&i.tamano===tamano); if(!ex) return prev; if(ex.cantidad<=1) return prev.filter(i=>i!==ex); return prev.map(i=>i===ex?{...i,cantidad:i.cantidad-1}:i); });
   };
-  const handleConfirmar=async(datos: Confirmacion['datos'])=>{
+  const handleConfirmar=async(datos)=>{
     const num=Math.floor(Math.random()*9999)+1;
     setConfirmacion({folio:`#FP:${String(num).padStart(4,"0")}`,datos}); setPaso(4);
   };
